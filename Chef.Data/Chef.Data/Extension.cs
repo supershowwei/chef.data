@@ -6,9 +6,11 @@ namespace Chef.Data
 {
     public static class Extension
     {
-        public static string GenerateUpdateCommand(this object me, out Dictionary<string, object> parameters)
+        public static string GenerateUpdateCommand(
+            this object me,
+            out IEnumerable<KeyValuePair<string, object>> parameters)
         {
-            parameters = new Dictionary<string, object>();
+            var dict = new Dictionary<string, object>();
 
             var table = (string)me.GetType()
                 .CustomAttributes.Single(x => x.AttributeType == typeof(TableAttribute))
@@ -32,14 +34,16 @@ namespace Chef.Data
                 if (field is Field)
                 {
                     setters.Add($"[{columnName}] = @{property.Name}");
-                    parameters.Add(property.Name, ((Field)field).GetValue());
+                    dict.Add(property.Name, ((Field)field).GetValue());
                 }
                 else
                 {
                     conditions.Add($"[{columnName}] = @{property.Name}");
-                    parameters.Add(property.Name, field);
+                    dict.Add(property.Name, field);
                 }
             }
+
+            parameters = dict.Count > 0 ? dict : null;
 
             return @"
 UPDATE [" + table + @"]
