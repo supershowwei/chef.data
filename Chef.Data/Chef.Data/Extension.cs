@@ -22,6 +22,8 @@ namespace Chef.Data
 
             foreach (var property in me.GetType().GetProperties())
             {
+                if (property.CustomAttributes.Any(x => x.AttributeType == typeof(NotMappedAttribute))) continue;
+
                 var customColumn =
                     property.CustomAttributes.SingleOrDefault(x => x.AttributeType == typeof(ColumnAttribute));
 
