@@ -23,6 +23,11 @@ namespace Chef.Data
             return new Field<T>(value);
         }
 
+        public static implicit operator T(Field<T> field)
+        {
+            return field.Value;
+        }
+
         public override Type GetValueType()
         {
             return typeof(T);
