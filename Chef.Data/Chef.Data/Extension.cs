@@ -31,17 +31,21 @@ namespace Chef.Data
                                      ? (string)customColumn.ConstructorArguments[0].Value
                                      : property.Name;
 
-                var field = property.GetValue(me);
+                var value = property.GetValue(me);
 
-                if (field is Field)
+                switch (value)
                 {
-                    setters.Add($"[{columnName}] = @{property.Name}");
-                    dict.Add(property.Name, ((Field)field).GetValue());
-                }
-                else
-                {
-                    conditions.Add($"[{columnName}] = @{property.Name}");
-                    dict.Add(property.Name, field);
+                    case null: continue;
+
+                    case Field field:
+                        setters.Add($"[{columnName}] = @{property.Name}");
+                        dict.Add(property.Name, field.GetValue());
+                        break;
+
+                    default:
+                        conditions.Add($"[{columnName}] = @{property.Name}");
+                        dict.Add(property.Name, value);
+                        break;
                 }
             }
 
