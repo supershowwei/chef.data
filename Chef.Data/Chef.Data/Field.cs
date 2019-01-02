@@ -16,6 +16,8 @@ namespace Chef.Data
             this.Value = value;
         }
 
+        public static Field<T> Default => new Field<T>(default(T));
+
         public T Value { get; }
 
         public static implicit operator Field<T>(T value)
