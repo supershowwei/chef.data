@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Linq;
 using System.Web.Mvc;
 
@@ -10,11 +11,40 @@ namespace Chef.Data.Mvc
         {
             var result = Activator.CreateInstance(bindingContext.ModelType);
 
-            foreach (var property in result.GetType().GetProperties())
+            if (typeof(IList).IsAssignableFrom(bindingContext.ModelType))
+            {
+                var prefix = bindingContext.ValueProvider.ContainsPrefix(bindingContext.ModelName)
+                                 ? bindingContext.ModelName
+                                 : string.Empty;
+
+                var index = 0;
+
+                while (bindingContext.ValueProvider.ContainsPrefix($"{prefix}[{index}]"))
+                {
+                    var item = Activator.CreateInstance(bindingContext.ModelType.GenericTypeArguments[0]);
+
+                    SetValues(bindingContext.ValueProvider, $"{prefix}[{index}].", ref item);
+
+                    ((IList)result).Add(item);
+
+                    index++;
+                }
+            }
+            else
+            {
+                SetValues(bindingContext.ValueProvider, string.Empty, ref result);
+            }
+
+            return result;
+        }
+
+        private static void SetValues(IValueProvider valueProvider, string prefix, ref object obj)
+        {
+            foreach (var property in obj.GetType().GetProperties())
             {
                 var propertyType = property.PropertyType;
 
-                var value = bindingContext.ValueProvider.GetValue(property.Name);
+                var value = valueProvider.GetValue(string.Concat(prefix, property.Name));
 
                 if (value == null) continue;
 
@@ -34,10 +64,8 @@ namespace Chef.Data.Mvc
                     parameter = GetParameter(propertyType, value.RawValue);
                 }
 
-                property.SetValue(result, parameter);
+                property.SetValue(obj, parameter);
             }
-
-            return result;
         }
 
         private static object GetParameter(Type propertyType, object rawValue)

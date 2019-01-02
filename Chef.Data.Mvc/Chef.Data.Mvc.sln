@@ -5,6 +5,10 @@ VisualStudioVersion = 15.0.28307.168
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chef.Data.Mvc", "Chef.Data.Mvc\Chef.Data.Mvc.csproj", "{C8C33354-04A0-4128-BD43-C3837E30FA56}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chef.Data.Mvc.NET461", "Chef.Data.Mvc.NET461\Chef.Data.Mvc.NET461.csproj", "{826F65A4-EEA5-4E0F-AAD2-712CE2A0467F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chef.Data.Mvc.NET451", "Chef.Data.Mvc.NET451\Chef.Data.Mvc.NET451.csproj", "{D8BC0D81-7B4F-46A4-9A83-81C2C4B4C117}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{C8C33354-04A0-4128-BD43-C3837E30FA56}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C8C33354-04A0-4128-BD43-C3837E30FA56}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C8C33354-04A0-4128-BD43-C3837E30FA56}.Release|Any CPU.Build.0 = Release|Any CPU
+		{826F65A4-EEA5-4E0F-AAD2-712CE2A0467F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{826F65A4-EEA5-4E0F-AAD2-712CE2A0467F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{826F65A4-EEA5-4E0F-AAD2-712CE2A0467F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{826F65A4-EEA5-4E0F-AAD2-712CE2A0467F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D8BC0D81-7B4F-46A4-9A83-81C2C4B4C117}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D8BC0D81-7B4F-46A4-9A83-81C2C4B4C117}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D8BC0D81-7B4F-46A4-9A83-81C2C4B4C117}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D8BC0D81-7B4F-46A4-9A83-81C2C4B4C117}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
