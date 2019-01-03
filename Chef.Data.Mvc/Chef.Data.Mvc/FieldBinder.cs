@@ -70,19 +70,18 @@ namespace Chef.Data.Mvc
 
         private static object GetParameter(Type propertyType, object rawValue)
         {
-            var propertyTypeFullName = propertyType.FullName ?? string.Empty;
             var rawValueTypeFullName = rawValue != null ? rawValue.GetType().FullName : string.Empty;
 
             if (rawValueTypeFullName.Contains("System.Decimal")) return Convert.ToDouble(rawValue);
 
-            if (propertyTypeFullName.Contains("System.DateTime"))
+            if (propertyType.FullName.Contains("System.DateTime"))
             {
                 return DateTime.TryParse((string)rawValue, out var datetime)
                            ? datetime
                            : Activator.CreateInstance(propertyType);
             }
 
-            if (propertyTypeFullName.Contains("System.Int") && rawValueTypeFullName.Contains("System.String"))
+            if (propertyType.FullName.Contains("System.Int") && rawValueTypeFullName.Contains("System.String"))
             {
                 var tryParser = propertyType.GetMethods()
                     .Single(x => x.Name.Equals("TryParse") && x.GetParameters().Length == 2);
