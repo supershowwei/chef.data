@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Linq;
 using System.Web.Mvc;
+using Chef.Data.Mvc.Extensions;
 
 namespace Chef.Data.Mvc
 {
@@ -48,51 +49,24 @@ namespace Chef.Data.Mvc
 
                 if (value == null) continue;
 
-                object parameter;
+                object objValue;
 
                 if (propertyType.IsSubclassOf(typeof(Field)))
                 {
                     var implicitAssignment = propertyType.GetMethods()
                         .Single(x => x.Name.Equals("op_Implicit") && x.ReturnType == propertyType);
 
-                    parameter = implicitAssignment.Invoke(
+                    objValue = implicitAssignment.Invoke(
                         null,
-                        new[] { GetParameter(propertyType.GenericTypeArguments[0], value.RawValue) });
+                        new[] { value.TryConvertTo(propertyType.GenericTypeArguments[0]) });
                 }
                 else
                 {
-                    parameter = GetParameter(propertyType, value.RawValue);
+                    objValue = value.ConvertTo(propertyType);
                 }
 
-                property.SetValue(obj, parameter);
+                property.SetValue(obj, objValue);
             }
-        }
-
-        private static object GetParameter(Type propertyType, object rawValue)
-        {
-            var rawValueTypeFullName = rawValue != null ? rawValue.GetType().FullName : string.Empty;
-
-            if (rawValueTypeFullName.Contains("System.Decimal")) return Convert.ToDouble(rawValue);
-
-            if (propertyType.FullName.Contains("System.DateTime"))
-            {
-                return DateTime.TryParse((string)rawValue, out var datetime)
-                           ? datetime
-                           : Activator.CreateInstance(propertyType);
-            }
-
-            if (propertyType.FullName.Contains("System.Int") && rawValueTypeFullName.Contains("System.String"))
-            {
-                var tryParser = propertyType.GetMethods()
-                    .Single(x => x.Name.Equals("TryParse") && x.GetParameters().Length == 2);
-
-                var parameters = new[] { rawValue, null };
-                var result = tryParser.Invoke(null, parameters);
-
-                return (bool)result ? parameters[1] : Activator.CreateInstance(propertyType);
-            }
-
-            return rawValue;
         }
     }
 }

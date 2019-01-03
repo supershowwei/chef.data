@@ -65,6 +65,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Chef.Data.Mvc\Extensions\ValueProviderResultExtension.cs">
+      <Link>Extensions\ValueProviderResultExtension.cs</Link>
+    </Compile>
     <Compile Include="..\Chef.Data.Mvc\FieldBinder.cs">
       <Link>FieldBinder.cs</Link>
     </Compile>
