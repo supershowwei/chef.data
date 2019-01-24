@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Text;
 
 namespace Chef.Data
 {
@@ -10,51 +12,81 @@ namespace Chef.Data
             this object me,
             out IEnumerable<KeyValuePair<string, object>> parameters)
         {
-            var dict = new Dictionary<string, object>();
+            return GenerateUpdateCommand(me, string.Empty, out parameters);
+        }
 
-            var table = (string)me.GetType()
-                .CustomAttributes.Single(x => x.AttributeType == typeof(TableAttribute))
-                .ConstructorArguments[0]
-                .Value;
+        private static string GenerateUpdateCommand(
+            this object me,
+            string suffix,
+            out IEnumerable<KeyValuePair<string, object>> parameters)
+        {
+            var output = new StringBuilder();
 
-            var conditions = new List<string>();
-            var setters = new List<string>();
-
-            foreach (var property in me.GetType().GetProperties())
+            if (me is IEnumerable enumerable)
             {
-                if (property.CustomAttributes.Any(x => x.AttributeType == typeof(NotMappedAttribute))) continue;
+                parameters = new Dictionary<string, object>();
 
-                var customColumn =
-                    property.CustomAttributes.SingleOrDefault(x => x.AttributeType == typeof(ColumnAttribute));
+                var index = 0;
 
-                var columnName = customColumn != null
-                                     ? (string)customColumn.ConstructorArguments[0].Value
-                                     : property.Name;
-
-                var value = property.GetValue(me);
-
-                switch (value)
+                foreach (var item in enumerable)
                 {
-                    case null: continue;
+                    output.AppendLine(GenerateUpdateCommand(item, index++.ToString(), out var tmpParameters));
 
-                    case Field field:
-                        setters.Add($"[{columnName}] = @{property.Name}");
-                        dict.Add(property.Name, field.GetValue());
-                        break;
-
-                    default:
-                        conditions.Add($"[{columnName}] = @{property.Name}");
-                        dict.Add(property.Name, value);
-                        break;
+                    if (tmpParameters != null) parameters = parameters.Concat(tmpParameters);
                 }
             }
+            else
+            {
+                var dict = new Dictionary<string, object>();
 
-            parameters = dict.Count > 0 ? dict : null;
+                var customTable = me.GetType()
+                    .CustomAttributes.SingleOrDefault(x => x.AttributeType == typeof(TableAttribute));
 
-            return @"
-UPDATE [" + table + @"]
-SET " + string.Join(", ", setters) + @"
-WHERE " + string.Join(" AND ", conditions);
+                var tableName = customTable != null
+                                    ? (string)customTable.ConstructorArguments[0].Value
+                                    : me.GetType().Name;
+
+                var conditions = new List<string>();
+                var setters = new List<string>();
+
+                foreach (var property in me.GetType().GetProperties())
+                {
+                    if (property.CustomAttributes.Any(x => x.AttributeType == typeof(NotMappedAttribute))) continue;
+
+                    var customColumn =
+                        property.CustomAttributes.SingleOrDefault(x => x.AttributeType == typeof(ColumnAttribute));
+
+                    var columnName = customColumn != null
+                                         ? (string)customColumn.ConstructorArguments[0].Value
+                                         : property.Name;
+
+                    var parameterName = string.Concat(property.Name, suffix);
+                    var parameterValue = property.GetValue(me);
+
+                    switch (parameterValue)
+                    {
+                        case null: continue;
+
+                        case Field field:
+                            setters.Add($"[{columnName}] = @{parameterName}");
+                            dict.Add(parameterName, field.GetValue());
+                            break;
+
+                        default:
+                            conditions.Add($"[{columnName}] = @{parameterName}");
+                            dict.Add(parameterName, parameterValue);
+                            break;
+                    }
+                }
+
+                parameters = dict.Count > 0 ? dict : null;
+
+                output.AppendLine($"UPDATE [{tableName}]");
+                output.AppendLine($"SET {string.Join(", ", setters)}");
+                output.AppendLine($"WHERE {string.Join(" AND ", conditions)}");
+            }
+
+            return output.ToString();
         }
     }
 }
