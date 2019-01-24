@@ -43,7 +43,7 @@ var member = new MemberUpdated
 
 var output = member.GenerateUpdateCommand(out var parameters);
 
-// ouput:
+// output:
 //    UPDATE [tblMember]
 //    SET [Tel] = @Phone, [Age] = @Age, [Name] = @Name
 //    WHERE [Id] = @Id
