@@ -7,7 +7,7 @@
 - 預設以屬性名稱為欄位名稱，如果要額外指定就在屬性上標記 `[Column("...")]`。
 - 被標記為 `[NotMapped]` 以及值為 `null` 的屬性會被略過
 
-下面是一個範例：
+底下是一個設計範例：
 
 ```cs
 [Table("tblMember")]
@@ -29,7 +29,7 @@ public class MemberUpdated
 }
 ```
 
-產生 UPDATE 語句就呼叫 `GenerateUpdateCommand()` 方法，下面是一個範例：
+產生 UPDATE 語句就呼叫 `GenerateUpdateCommand()` 方法，底下是一個使用範例：
 
 ```cs
 var member = new MemberUpdated
@@ -69,7 +69,7 @@ var output = member.GenerateUpdateCommand(out var parameters);
 //    ]
 ```
 
-支援對象是集合型別，只要是有實作 `IEnumerable` 的對象，會輸出多個 UPDATE 語句。
+支援集合型別的對象，只要是有實作 `IEnumerable` 的對象，會輸出多個 UPDATE 語句。
 
 ```cs
 var members = new List<MemberUpdated>
