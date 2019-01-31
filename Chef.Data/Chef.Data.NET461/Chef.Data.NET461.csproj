@@ -42,6 +42,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Chef.Data\DictionaryExtension.cs">
+      <Link>DictionaryExtension.cs</Link>
+    </Compile>
     <Compile Include="..\Chef.Data\Extension.cs">
       <Link>Extension.cs</Link>
     </Compile>

@@ -20,25 +20,22 @@ namespace Chef.Data
             string suffix,
             out IEnumerable<KeyValuePair<string, object>> parameters)
         {
+            var dict = new Dictionary<string, object>();
             var output = new StringBuilder();
-
+            
             if (me is IEnumerable enumerable)
             {
-                parameters = new Dictionary<string, object>();
-
                 var index = 0;
 
                 foreach (var item in enumerable)
                 {
                     output.AppendLine(GenerateUpdateCommand(item, index++.ToString(), out var tmpParameters));
 
-                    if (tmpParameters != null) parameters = parameters.Concat(tmpParameters);
+                    if (tmpParameters != null) dict.AddRange(tmpParameters);
                 }
             }
             else
             {
-                var dict = new Dictionary<string, object>();
-
                 var customTable = me.GetType()
                     .CustomAttributes.SingleOrDefault(x => x.AttributeType == typeof(TableAttribute));
 
@@ -79,12 +76,12 @@ namespace Chef.Data
                     }
                 }
 
-                parameters = dict.Count > 0 ? dict : null;
-
                 output.AppendLine($"UPDATE [{tableName}]");
                 output.AppendLine($"SET {string.Join(", ", setters)}");
                 output.AppendLine($"WHERE {string.Join(" AND ", conditions)}");
             }
+
+            parameters = dict.Count > 0 ? dict : null;
 
             return output.ToString();
         }
