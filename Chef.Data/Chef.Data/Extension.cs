@@ -36,12 +36,10 @@ namespace Chef.Data
             }
             else
             {
-                var customTable = me.GetType()
-                    .CustomAttributes.SingleOrDefault(x => x.AttributeType == typeof(TableAttribute));
-
-                var tableName = customTable != null
-                                    ? (string)customTable.ConstructorArguments[0].Value
-                                    : me.GetType().Name;
+                var tableName = (string)me.GetType()
+                    .CustomAttributes.Single(x => x.AttributeType == typeof(TableAttribute))
+                    .ConstructorArguments[0]
+                    .Value;
 
                 var conditions = new List<string>();
                 var setters = new List<string>();
@@ -78,7 +76,7 @@ namespace Chef.Data
 
                 output.AppendLine($"UPDATE [{tableName}]");
                 output.AppendLine($"SET {string.Join(", ", setters)}");
-                output.AppendLine($"WHERE {string.Join(" AND ", conditions)}");
+                output.AppendLine($"WHERE {string.Join(" AND ", conditions)};");
             }
 
             parameters = dict.Count > 0 ? dict : null;
