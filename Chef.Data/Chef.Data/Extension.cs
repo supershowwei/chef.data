@@ -16,7 +16,7 @@ namespace Chef.Data
         }
 
         private static string GenerateUpdateCommand(
-            this object me,
+            object me,
             string suffix,
             out IEnumerable<KeyValuePair<string, object>> parameters)
         {
@@ -29,7 +29,7 @@ namespace Chef.Data
 
                 foreach (var item in enumerable)
                 {
-                    output.AppendLine(GenerateUpdateCommand(item, index++.ToString(), out var tmpParameters));
+                    output.AppendLine(GenerateUpdateCommand(item, $"_{index++}", out var tmpParameters));
 
                     if (tmpParameters != null) dict.AddRange(tmpParameters);
                 }
