@@ -11,7 +11,7 @@ namespace Chef.Data.Linq2Db
 {
     public static class Extension
     {
-        public static void Update<TTable>(this IFieldSet me, DataConnection cnn)
+        public static void Update<TTable>(this IFieldSet me, DataConnection conn)
             where TTable : class
         {
             var tableType = typeof(TTable);
@@ -39,7 +39,7 @@ namespace Chef.Data.Linq2Db
                 }
             }
 
-            var queryable = cnn.GetTable<TTable>().Where(Expression.Lambda<Func<TTable, bool>>(predicate, parameterExpr));
+            var queryable = conn.GetTable<TTable>().Where(Expression.Lambda<Func<TTable, bool>>(predicate, parameterExpr));
 
             var setMethod = typeof(LinqExtensions).GetMethods()
                 .Where(
