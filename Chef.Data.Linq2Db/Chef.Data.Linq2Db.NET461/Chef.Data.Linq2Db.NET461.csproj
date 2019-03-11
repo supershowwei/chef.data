@@ -7,8 +7,8 @@
     <ProjectGuid>{8F473D13-383A-4595-A45D-B2E479F516EC}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Chef.Data.Linq2Db.NET461</RootNamespace>
-    <AssemblyName>Chef.Data.Linq2Db.NET461</AssemblyName>
+    <RootNamespace>Chef.Data.Linq2Db</RootNamespace>
+    <AssemblyName>Chef.Data.Linq2Db</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
