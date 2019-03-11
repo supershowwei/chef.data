@@ -51,6 +51,9 @@
     <Compile Include="..\Chef.Data\Field.cs">
       <Link>Field.cs</Link>
     </Compile>
+    <Compile Include="..\Chef.Data\IFieldSet.cs">
+      <Link>IFieldSet.cs</Link>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
