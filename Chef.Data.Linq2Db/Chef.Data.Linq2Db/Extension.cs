@@ -18,7 +18,7 @@ namespace Chef.Data.Linq2Db
             var parameterExpr = Expression.Parameter(tableType);
 
             Expression predicate = null;
-            var setters = new List<(Field Field, Expression Lambda)>();
+            var setters = new List<Setter>();
 
             foreach (var property in me.GetType().GetProperties())
             {
@@ -29,7 +29,7 @@ namespace Chef.Data.Linq2Db
 
                 if (propertyValue is Field field)
                 {
-                    setters.Add((field, Expression.Lambda(propertyExpr, parameterExpr)));
+                    setters.Add(new Setter(field, Expression.Lambda(propertyExpr, parameterExpr)));
                 }
                 else
                 {
@@ -79,6 +79,19 @@ namespace Chef.Data.Linq2Db
             }
 
             updatable.Update();
+        }
+
+        private class Setter
+        {
+            public Setter(Field field, Expression lambda)
+            {
+                this.Field = field;
+                this.Lambda = lambda;
+            }
+
+            public Field Field { get; set; }
+
+            public Expression Lambda { get; set; }
         }
     }
 }
