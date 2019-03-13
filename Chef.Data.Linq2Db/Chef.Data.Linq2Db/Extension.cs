@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using LinqToDB;
 using LinqToDB.Data;
 using LinqToDB.Linq;
@@ -11,6 +12,21 @@ namespace Chef.Data.Linq2Db
 {
     public static class Extension
     {
+        private static readonly Dictionary<string, MethodInfo> SetMethods = typeof(LinqExtensions).GetMethods()
+            .Where(
+                x =>
+                    {
+                        if (!x.Name.Equals("Set")) return false;
+
+                        var ps = x.GetParameters();
+
+                        if (ps.Length != 3) return false;
+                        if (ps[2].ParameterType.IsGenericType) return false;
+
+                        return true;
+                    })
+            .ToDictionary(x => x.GetParameters()[0].ParameterType.Name, x => x);
+
         public static void Update<TTable>(this IFieldSet me, DataConnection conn)
             where TTable : class
         {
@@ -41,20 +57,6 @@ namespace Chef.Data.Linq2Db
 
             var queryable = conn.GetTable<TTable>().Where(Expression.Lambda<Func<TTable, bool>>(predicate, parameterExpr));
 
-            var setMethod = typeof(LinqExtensions).GetMethods()
-                .Where(
-                    x =>
-                    {
-                        if (!x.Name.Equals("Set")) return false;
-
-                        var ps = x.GetParameters();
-
-                        if (ps.Length != 3) return false;
-                        if (ps[2].ParameterType.IsGenericType) return false;
-
-                        return true;
-                    })
-                .ToDictionary(x => x.GetParameters()[0].ParameterType.Name, x => x);
 
             IUpdatable<TTable> updatable = null;
 
@@ -62,7 +64,7 @@ namespace Chef.Data.Linq2Db
             {
                 if (updatable == null)
                 {
-                    updatable = setMethod["IQueryable`1"]
+                    updatable = SetMethods["IQueryable`1"]
                                         .MakeGenericMethod(tableType, setter.Field.GetValueType())
                                         .Invoke(
                                             null,
@@ -70,7 +72,7 @@ namespace Chef.Data.Linq2Db
                 }
                 else
                 {
-                    updatable = setMethod["IUpdatable`1"]
+                    updatable = SetMethods["IUpdatable`1"]
                                         .MakeGenericMethod(tableType, setter.Field.GetValueType())
                                         .Invoke(
                                             null,
