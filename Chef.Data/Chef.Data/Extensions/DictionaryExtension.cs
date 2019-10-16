@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Chef.Data
+namespace Chef.Data.Extensions
 {
     internal static class DictionaryExtension
     {

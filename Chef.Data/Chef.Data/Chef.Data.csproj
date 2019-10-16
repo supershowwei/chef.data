@@ -42,11 +42,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DictionaryExtension.cs" />
+    <Compile Include="Extensions\DictionaryExtension.cs" />
     <Compile Include="Extension.cs" />
     <Compile Include="Field.cs" />
     <Compile Include="IFieldSet.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

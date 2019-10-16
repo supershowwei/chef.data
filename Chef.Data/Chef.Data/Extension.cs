@@ -1,67 +1,50 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
+using System.Reflection;
 using System.Text;
 
 namespace Chef.Data
 {
     public static class Extension
     {
-        public static string GenerateUpdateCommand(
-            this IFieldSet me,
-            out IEnumerable<KeyValuePair<string, object>> parameters)
+        public static string ToUpdateCommand(this IFieldSet me, out IDictionary<string, object> parameters)
         {
-            return GenerateUpdateCommand(me, string.Empty, out parameters);
+            parameters = new Dictionary<string, object>();
+
+            return ToUpdateCommand(me, string.Empty, parameters);
         }
 
-        public static string GenerateUpdateCommand(
-            this IEnumerable<IFieldSet> me,
-            out IEnumerable<KeyValuePair<string, object>> parameters)
+        public static string ToUpdateCommand(this IEnumerable<IFieldSet> me, out IDictionary<string, object> parameters)
         {
-            var dict = new Dictionary<string, object>();
+            parameters = new Dictionary<string, object>();
+
             var output = new StringBuilder();
 
             var index = 0;
 
             foreach (var item in me)
             {
-                output.AppendLine(GenerateUpdateCommand(item, $"_{index++}", out var tmpParameters));
-
-                if (tmpParameters != null) dict.AddRange(tmpParameters);
+                output.AppendLine(ToUpdateCommand(item, $"_{index++}", parameters));
             }
-
-            parameters = dict.Count > 0 ? dict : null;
 
             return output.ToString();
         }
 
-        private static string GenerateUpdateCommand(
-            object me,
-            string suffix,
-            out IEnumerable<KeyValuePair<string, object>> parameters)
+        private static string ToUpdateCommand(object me, string suffix, IDictionary<string, object> parameters)
         {
-            var dict = new Dictionary<string, object>();
             var output = new StringBuilder();
 
-            var tableName = (string)me.GetType()
-                .CustomAttributes.Single(x => x.AttributeType == typeof(TableAttribute))
-                .ConstructorArguments[0]
-                .Value;
+            var tableName = me.GetType().GetCustomAttribute<TableAttribute>().Name;
 
             var conditions = new List<string>();
             var setters = new List<string>();
 
             foreach (var property in me.GetType().GetProperties())
             {
-                if (property.CustomAttributes.Any(x => x.AttributeType == typeof(NotMappedAttribute))) continue;
+                if (property.GetCustomAttribute<NotMappedAttribute>() != null) continue;
 
-                var customColumn =
-                    property.CustomAttributes.SingleOrDefault(x => x.AttributeType == typeof(ColumnAttribute));
-
-                var columnName = customColumn != null
-                                     ? (string)customColumn.ConstructorArguments[0].Value
-                                     : property.Name;
+                var columnAttribute = property.GetCustomAttribute<ColumnAttribute>();
+                var columnName = columnAttribute?.Name ?? property.Name;
 
                 var parameterName = string.Concat(property.Name, suffix);
                 var parameterValue = property.GetValue(me);
@@ -72,12 +55,12 @@ namespace Chef.Data
 
                     case Field field:
                         setters.Add($"[{columnName}] = @{parameterName}");
-                        dict.Add(parameterName, field.GetValue());
+                        parameters.Add(parameterName, field.GetValue());
                         break;
 
                     default:
                         conditions.Add($"[{columnName}] = @{parameterName}");
-                        dict.Add(parameterName, parameterValue);
+                        parameters.Add(parameterName, parameterValue);
                         break;
                 }
             }
@@ -85,8 +68,6 @@ namespace Chef.Data
             output.AppendLine($"UPDATE [{tableName}]");
             output.AppendLine($"SET {string.Join(", ", setters)}");
             output.AppendLine($"WHERE {string.Join(" AND ", conditions)};");
-
-            parameters = dict.Count > 0 ? dict : null;
 
             return output.ToString();
         }

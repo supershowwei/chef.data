@@ -42,11 +42,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\Chef.Data\DictionaryExtension.cs">
-      <Link>DictionaryExtension.cs</Link>
-    </Compile>
     <Compile Include="..\Chef.Data\Extension.cs">
       <Link>Extension.cs</Link>
+    </Compile>
+    <Compile Include="..\Chef.Data\Extensions\DictionaryExtension.cs">
+      <Link>Extensions\DictionaryExtension.cs</Link>
     </Compile>
     <Compile Include="..\Chef.Data\Field.cs">
       <Link>Field.cs</Link>
@@ -56,5 +56,6 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
